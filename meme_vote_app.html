@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Голосование за мемы</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; }
+    img { max-width: 90%; height: auto; border-radius: 10px; margin-bottom: 10px; }
+    .vote-buttons { margin: 20px; }
+    button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; }
+    #results { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h1>Голосование за лучший мем</h1>
+
+  <div id="round-info"></div>
+  <div id="meme-container"></div>
+  <div class="vote-buttons">
+    <button onclick="vote(0)">Мем 1</button>
+    <button onclick="vote(1)">Мем 2</button>
+  </div>
+  <div id="results"></div>
+
+  <script>
+    const rounds = [
+      [
+        { id: 'm1', src: 'Леша 2.jpg', votes: 0 },
+        { id: 'm2', src: 'Леша 4.jpg', votes: 0 }
+      ]
+    ];
+
+    let currentRound = 0;
+    let currentPair = 0;
+
+    function showPair() {
+      const pair = rounds[currentRound][currentPair];
+      const nextPair = rounds[currentRound][currentPair + 1];
+      document.getElementById('round-info').innerText = `Раунд ${currentRound + 1}, Пара ${Math.floor(currentPair / 2) + 1}`;
+      document.getElementById('meme-container').innerHTML = `
+        <div>
+          <img src="${pair.src}" alt="Мем 1">
+          <img src="${nextPair.src}" alt="Мем 2">
+        </div>
+      `;
+    }
+
+    function vote(index) {
+      rounds[currentRound][currentPair + index].votes++;
+      currentPair += 2;
+      if (currentPair >= rounds[currentRound].length) {
+        finishRound();
+      } else {
+        showPair();
+      }
+    }
+
+    function finishRound() {
+      const winners = [];
+      for (let i = 0; i < rounds[currentRound].length; i += 2) {
+        const a = rounds[currentRound][i];
+        const b = rounds[currentRound][i + 1];
+        winners.push(a.votes >= b.votes ? a : b);
+      }
+      if (winners.length === 1) {
+        document.getElementById('meme-container').innerHTML = `<h2>Победитель:</h2><img src="${winners[0].src}" alt="Победитель">`;
+        document.querySelector('.vote-buttons').style.display = 'none';
+      } else {
+        rounds.push(winners);
+        currentRound++;
+        currentPair = 0;
+        showPair();
+      }
+    }
+
+    showPair();
+  </script>
+</body>
+</html>
